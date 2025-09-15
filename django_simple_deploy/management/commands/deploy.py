@@ -77,8 +77,15 @@ class Command(BaseCommand):
         # Import the platform-specific plugin module. This performs some validation, so
         # it's best to call this before modifying project in any way. Also, the plugin
         # manager is needed in `add_arguments()`, so it needs to be defined here.
-        platform_module = self._load_plugin()
-        pm.register(platform_module)
+        # 
+        # If there are no plugins available, this will raise DSDCommandError, but the handler
+        # hasn't been set up yet to handle that. Catch it, and show the message.
+        try:
+            platform_module = self._load_plugin()
+        except DSDCommandError as e:
+            sys.exit(e.message)
+        else:
+            pm.register(platform_module)
 
         super().__init__()
 
@@ -103,7 +110,7 @@ class Command(BaseCommand):
         sd_cli = cli.SimpleDeployCLI(parser)
 
         # Add plugin-specific CLI args.
-        pm.hook.dsd_get_plugin_cli_args(parser=parser)
+        pm.hook.dsd_get_plugin_cli(parser=parser)
 
     def handle(self, *args, **options):
         """Manage the overall configuration process.
@@ -171,6 +178,9 @@ class Command(BaseCommand):
         # Developer arguments.
         dsd_config.unit_testing = options["unit_testing"]
         dsd_config.e2e_testing = options["e2e_testing"]
+
+        # Validate plugin CLI options now.
+        pm.hook.dsd_validate_cli(options=options)
 
     def _start_logging(self):
         """Set up for logging.
