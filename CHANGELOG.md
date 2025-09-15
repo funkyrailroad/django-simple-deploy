@@ -8,7 +8,23 @@ For inspiration and motivation, see [Keep a CHANGELOG](https://keepachangelog.co
 
 This release will have a stable public interface for end users, and for plugin developers as well. The project will continue to be refined internally and may gain some new features, but will have overall stability as a high priority.
 
-### 1.1.0
+### 1.2.1
+
+#### External changes
+
+- Documents vm-size option for Fly.io in Quick Start.
+- New plugin doc page for extending the core CLI.
+- Fixes bug showing exception when running --help with no plugin installed.
+
+#### Internal changes
+
+- Plugins can extend django-simple-deploy's CLI.
+    - Core calls the plugin's validation function, so plugins can validate CLI args as well.
+    - Allows test modules to skip automatic deploy calls during integration tests using a registered module-level pytest marker, `pytestmark = pytest.mark.skip_auto_dsd_call`.
+- Plugin utility for removing doubled blank lines from a file, allowing well-structured templates.
+- Updates test for help output, allowing for possibility of plugin-specific section.
+
+### 1.1.1
 
 #### External changes
 
