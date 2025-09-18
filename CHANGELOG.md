@@ -8,15 +8,21 @@ For inspiration and motivation, see [Keep a CHANGELOG](https://keepachangelog.co
 
 This release will have a stable public interface for end users, and for plugin developers as well. The project will continue to be refined internally and may gain some new features, but will have overall stability as a high priority.
 
-### (Unreleased)
+### 1.3.0
 
 #### External changes
 
-- N/A
+- Supports `nanodjango` projects. This really means the core django-simple-deploy library does not reject `nanodjango` projects. You will need to use a plugin that specifically supports `nanodjango` at this point.
 
 #### Internal changes
 
 - When running e2e tests, the `--plugin-args-string` argument can be used to pass plugin-specific CLI args for the e2e `deploy` call. ie `$ pytest tests/e2e_tests --plugin dsd_flyio -s --plugin-args-string "--vm-size shared-cpu-2x"`.
+- Supporting `nanodjango` projects:
+    - If no standard settings found, look at command for a `nanodjango` component.
+    - If `nanodjango` signature found, set `None` for settings path.
+    - Also set `dsd_config.nanodjango_project` to `True`.
+    - Grab main script name from command, and set `dsd_config.nanodjango_script`.
+    - Don't validate settings path for `nanodjango` projects.
 
 ### 1.2.1
 
