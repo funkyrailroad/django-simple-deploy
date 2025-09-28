@@ -7,6 +7,7 @@ import logging
 import re
 import subprocess
 import shlex
+import sys
 import toml
 from pathlib import Path
 
@@ -312,7 +313,7 @@ def write_output(output, write_to_console=True, skip_logging=False):
     """
     output_str = get_string_from_output(output)
 
-    if write_to_console:
+    if write_to_console and not logs_to_console():
         dsd_config.stdout.write(output_str)
 
     if not skip_logging:
@@ -398,6 +399,22 @@ def get_template_string(template_path, context):
     my_engine = Engine()
     template = my_engine.from_string(template_path.read_text())
     return template.render(Context(context))
+
+
+def remove_doubled_blank_lines(contents):
+    """Remove doubled blank lines from a content string.
+
+    Template tags often render as blank lines. Dealing with this in the
+    template usually makes the template much less readable.
+
+    Let plugin authors call this explicitly. If we put this in 
+    get_template_string(), you could never have intentional double blank
+    lines in rendered templates.
+    """
+    while "\n\n\n" in contents:
+        contents = contents.replace("\n\n\n", "\n\n")
+
+    return contents
 
 
 def read_log():
@@ -537,3 +554,22 @@ def add_req_txt_pkg(req_txt_path, package, version):
     contents = req_txt_path.read_text()
     pkg_string = f"\n{package + version}"
     req_txt_path.write_text(contents + pkg_string)
+
+def logs_to_console(logger=None):
+    """Check if logging is configured to stream to stdout or stderr."""
+    if not logger:
+        logger = logging.getLogger(__name__)
+
+    for handler in logger.handlers:
+        if not isinstance(handler, logging.StreamHandler):
+            continue
+
+        if handler.stream in (sys.stdout, sys.stderr):
+            return True
+
+    if logger.propagate and logger.parent:
+        return logs_to_console(logger.parent)
+
+    # Logging is not configured to stream to stdout or stderr.
+    return False
+    

@@ -47,6 +47,25 @@ You can test a deployment with the `--automate-all` flag:
 
 You won't notice a whole lot of difference compared to e2e tests without this flag, but it mimics the user's actions when using this flag. Instead of the e2e tests making commits on the test project, the `deploy` command makes those commits and runs the platform's push command just as it would on a user's system.
 
+### Testing plugin-specific CLI args
+
+You can test plugin-specific CLI args by passing the `--plugin-args-string` option:
+
+```sh
+$ pytest tests/e2e_tests --plugin dsd_flyio -s --plugin-args-string "--vm-size shared-cpu-2x"
+```
+
+Your test must pass the `cli_options.plugin_args_string` value to the function that actually calls `deploy`:
+
+```python
+def test_deployment(tmp_project, cli_options, request):
+    """Test the full, live deployment process to Fly.io."""
+    ...
+
+    # Run simple_deploy against the test project.
+    it_utils.run_simple_deploy(python_cmd, "fly_io", cli_options.automate_all, cli_options.plugin_args_string)
+```
+
 ### Tests as a development tool
 
 If you're investigating a bug that integration tests aren't helping with, a really efficient approach is to run the e2e test for the platform and workflow you're focusing on. Then open the test project in a new terminal window, activate its virtual environment, and do your development and debugging work there. You can reset the project to any state you want, modify `django-simple-deploy` and/or the relevant plugin, and rerun the `deploy` command as many times as you need. This is often much more efficient than making a sample project and doing a manual push using `django-simple-deploy`.

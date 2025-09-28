@@ -17,8 +17,12 @@ def dsd_get_plugin_config():
     """
 
 @hookspec
-def dsd_get_plugin_cli_args(parser):
-    """Get plugin-specific CLI args."""
+def dsd_get_plugin_cli(parser):
+    """Get plugin's CLI extension."""
+
+@hookspec
+def dsd_validate_cli(options):
+    """Validate the plugin-specific CLI args."""
 
 @hookspec
 def dsd_deploy():
