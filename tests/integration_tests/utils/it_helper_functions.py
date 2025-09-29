@@ -126,19 +126,17 @@ def check_package_manager_available(pkg_manager):
     else:
         msg = dedent(
             f"""
-        --- You must have {pkg_manager.title()} installed in order to run integration tests. ---
 
-        If you have a strong reason not to install {pkg_manager.title()}, please open an issue
-        and share your reasoning. We can look at installing {pkg_manager.title()} to the test
-        environment each time a test is run.
-
-        Instructions for installing {pkg_manager.title()} can be found here:
+        --- To run the full set of tests, {pkg_manager.title()} should be installed. ---
+          Instructions for installing {pkg_manager.title()} can be found here:
         """
         )
 
         if pkg_manager == "poetry":
-            msg += "https://python-poetry.org/docs/#installation"
+            msg += "  https://python-poetry.org/docs/#installation\n"
         elif pkg_manager == "pipenv":
-            msg += "https://pipenv.pypa.io/en/latest/install/#installing-pipenv"
+            msg += "  https://pipenv.pypa.io/en/latest/install/#installing-pipenv\n"
 
-        pytest.exit(msg)
+        print(msg)
+
+        return False
